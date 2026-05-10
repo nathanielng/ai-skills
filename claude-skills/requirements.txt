@@ -1,0 +1,5 @@
+# No external runtime dependencies - uses only Python standard library
+
+# Development/Testing dependencies
+pytest>=7.0
+pytest-cov>=3.0
