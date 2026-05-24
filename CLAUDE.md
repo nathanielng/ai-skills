@@ -1,33 +1,44 @@
 # AI Skills Repository
 
-## Git Security: PII & Sensitive Data Check
+## Git Security: Automated Secret Scanning
 
-**⚠️ BEFORE EVERY `git commit` AND `git push`:**
+**Automated pre-commit hooks enabled** — secret detection runs automatically before every commit via `gitleaks` + `pre-commit-hooks`:
 
-Always scan for sensitive data using:
 ```bash
-git diff --cached      # Review what's being committed
-git log -p -S"password" --all  # Search history for passwords
-git log -p -S"key" --all        # Search history for keys
-git log -p -S"credential" --all # Search for credentials
+git commit               # Hooks run automatically, scanning for:
+                        # - Hardcoded secrets (API keys, tokens, credentials)
+                        # - Private SSH keys
+                        # - Passwords and auth tokens
+                        # - Config files with secrets
 ```
 
-**Never commit:**
+**What's protected:**
 - API keys, tokens, credentials
-- `.env` files (use `.env.example` instead)
-- `secrets.json`, `credentials.yaml`
 - AWS/GCP/Azure credentials
+- `.env` files and `secrets.json`
 - Personal info (emails, phone numbers, SSN)
-- Private URLs or endpoints
 - Auth tokens, JWT secrets
 - Database connection strings with passwords
 
-**If you find sensitive data:**
+**If secrets are detected:**
 ```bash
-git restore --staged filename    # Remove from staging
-# Edit .gitignore to prevent future commits
-git rm --cached filename         # Remove from repo history (if already committed)
-# Then recommit after fixing
+# The commit will be blocked and you'll see the detected secrets
+# Option 1: Remove the file from staging
+git restore --staged filename
+
+# Option 2: Delete the secret content, then stage again
+# Edit filename to remove the secret, then:
+git add filename
+git commit
+
+# Option 3: Permanently remove from git history (if already committed)
+git rm --cached filename  # Remove the file
+git commit --amend        # Amend the commit
+```
+
+**Manual review still recommended:**
+```bash
+git diff --cached        # Review what you're about to commit
 ```
 
 ## Repository Structure
