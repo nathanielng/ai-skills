@@ -1,0 +1,2 @@
+# False positive: bedrock-2023-05-31 is an API version string, not a secret
+pageindex/SKILL.md:generic-api-key:46
