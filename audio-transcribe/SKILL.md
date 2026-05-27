@@ -1,6 +1,11 @@
-# audio-transcribe
+---
+name: audio-transcribe
+description: Transcribe audio files (mp3, wav, m4a, etc.) to text on-device using Apple Silicon GPU via Metal. Use when asked to transcribe audio, convert speech to text, generate subtitles, or extract text from audio/video files.
+---
 
-Transcribe audio files to text on-device using Apple Silicon GPU via Metal. No cloud APIs or keys required.
+# Audio Transcribe — On-Device Speech-to-Text (Apple Silicon)
+
+Transcribe audio files locally on Mac using Metal GPU acceleration. No cloud APIs or keys required.
 
 ## Two Backends
 
