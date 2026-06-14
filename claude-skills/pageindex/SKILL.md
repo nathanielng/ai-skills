@@ -36,7 +36,7 @@ python /path/to/obsidian-pageindex.py               # Interactive mode
 
 ## Configuration
 
-- **Python script**: `~/code/ai-skills/pageindex/obsidian-pageindex.py`
+- **Python script**: `~/code/ai-skills/claude-skills/pageindex/obsidian-pageindex.py`
 - **Vault path**: Set via `OBSIDIAN_PATH` environment variable (no hardcoded paths)
 - **Vector store**: `$OBSIDIAN_PATH/rag-vectorstore`
 - **Bedrock config**:
