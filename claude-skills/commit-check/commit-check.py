@@ -73,7 +73,7 @@ PATTERNS: list[Pattern] = [
     Pattern("windows_user_path",   r'C:\\Users\\[A-Za-z][A-Za-z0-9_.-]+\\',       "error",   "Windows C:\\Users\\<name>\\ path"),
 
     # --- Specific personal path fragments ---
-    Pattern("personal_code_dir",   r'(?i)/code/[a-z]',                             "warning", "Hardcoded ~/code/ project path — use relative paths",
+    Pattern("personal_code_dir",   r'(?i)(?:~/code/|/code/)[a-z]',                 "warning", "Hardcoded ~/code/ or /code/ project path — use relative paths",
             allowlist=["# example", "YOUR_PATH", "your_path"]),
 ]
 
