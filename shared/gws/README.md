@@ -18,18 +18,18 @@ Safe Python wrappers around the Google Workspace CLI (`gws`) with rate limiting,
 
 1. Clone this repo:
 ```bash
-git clone https://github.com/nathanielng/claude-skills.git
-cd claude-skills
+git clone https://github.com/nathanielng/ai-skills.git
+cd ai-skills/shared/gws
 ```
 
 2. Make scripts executable:
 ```bash
-chmod +x scripts/gws_*.py
+chmod +x gws_*.py
 ```
 
 3. (Optional) Add to PATH for easier access:
 ```bash
-export PATH="$PATH:$(pwd)/scripts"
+export PATH="$PATH:$(pwd)"
 ```
 
 ## Usage
@@ -38,26 +38,26 @@ export PATH="$PATH:$(pwd)/scripts"
 
 Read-only (no confirmation needed):
 ```bash
-python3 scripts/gws_gmail.py users getProfile
-python3 scripts/gws_gmail.py users.messages list
+python3 gws_gmail.py users getProfile
+python3 gws_gmail.py users.messages list
 ```
 
 Destructive operations (with confirmation):
 ```bash
-python3 scripts/gws_gmail.py +send --to user@example.com --subject "Test" --body "Hello"
+python3 gws_gmail.py +send --to user@example.com --subject "Test" --body "Hello"
 # Shows dry-run output, prompts: Execute for real? [y/N]
 ```
 
 Skip confirmation:
 ```bash
-python3 scripts/gws_gmail.py +send --to user@example.com --subject "Test" --body "Hello" --force
+python3 gws_gmail.py +send --to user@example.com --subject "Test" --body "Hello" --force
 ```
 
 ### Calendar Operations
 
 ```bash
-python3 scripts/gws_calendar.py calendarList list
-python3 scripts/gws_calendar.py +insert --summary "Meeting" --startTime "2026-05-15T10:00:00"
+python3 gws_calendar.py calendarList list
+python3 gws_calendar.py +insert --summary "Meeting" --startTime "2026-05-15T10:00:00"
 ```
 
 ### Flags
@@ -92,7 +92,7 @@ The rate limiter persists to `~/.cache/gws-wrapper/rate.json`. The 30 calls/minu
 
 ```bash
 # This will fail on the 31st call within a minute
-for i in {1..31}; do python3 scripts/gws_gmail.py users getProfile; done
+for i in {1..31}; do python3 gws_gmail.py users getProfile; done
 # Error: Rate limit exceeded: 30 calls/min. Reset in ~60s.
 ```
 
@@ -117,13 +117,13 @@ The wrapper adds rate limiting, confirmation prompts, dry-run preview, and audit
 Run the test suite:
 
 ```bash
-python3 -m pytest tests/ -v
+python3 -m pytest ../tests/ -v
 ```
 
 Or run with coverage:
 
 ```bash
-python3 -m pytest tests/ --cov=scripts --cov-report=html
+python3 -m pytest ../tests/ --cov=. --cov-report=html
 ```
 
 ## License
