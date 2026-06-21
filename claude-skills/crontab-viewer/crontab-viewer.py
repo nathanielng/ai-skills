@@ -108,10 +108,11 @@ def generate_html(jobs: list[dict]) -> str:
         for idx, job in enumerate(jobs):
             desc_cell = f'<td><span class="desc">{html_escape(job["description"])}</span></td>' if job["description"] else '<td style="color:#666;">—</td>'
             sample_data = samples.get(job.get("description", ""))
-            expand_btn = f'<button class="expand-btn" onclick="toggleRow({idx})">▶</button>' if sample_data else '<span style="width:24px;"></span>'
+            expand_indicator = '<span class="expand-indicator">▶</span>' if sample_data else ''
+            clickable_class = 'clickable' if sample_data else ''
 
-            job_rows += f'''    <tr class="job-row" id="job-{idx}">
-      {expand_btn}
+            job_rows += f'''    <tr class="job-row {clickable_class}" id="job-{idx}" onclick="toggleRow({idx})">
+      <td>{expand_indicator}</td>
       <td><code>{job['minute']}</code></td>
       <td><code>{job['hour']}</code></td>
       <td><code>{job['day_of_month']}</code></td>
@@ -163,9 +164,12 @@ def generate_html(jobs: list[dict]) -> str:
   .freq-badge {{ display: inline-block; font-size: 0.7rem; background: #1e40af; color: #93c5fd; border-radius: 4px; padding: 0.25rem 0.5rem; white-space: nowrap; }}
   .desc {{ color: #cbd5e1; font-size: 0.85rem; font-weight: 500; }}
 
-  .expand-btn {{ background: none; border: none; color: #64748b; cursor: pointer; font-size: 0.7rem; padding: 0; width: 24px; text-align: center; transition: transform 0.2s; }}
-  .expand-btn:hover {{ color: #93c5fd; }}
-  .expand-btn.open {{ transform: rotate(90deg); }}
+  .job-row.clickable {{ cursor: pointer; }}
+  .job-row.clickable:hover {{ background: #252a3a; }}
+
+  .expand-indicator {{ display: inline-block; width: 16px; color: #64748b; font-size: 0.7rem; transition: transform 0.2s; }}
+  .job-row.clickable .expand-indicator {{ color: #93c5fd; }}
+  .job-row.open .expand-indicator {{ transform: rotate(90deg); }}
 
   .sample-row {{ background: #0f1117 !important; }}
   .sample-container {{ padding: 1rem; background: #0a0e16; border: 1px solid #2d3348; border-radius: 8px; margin-top: 0.5rem; }}
@@ -219,13 +223,13 @@ def generate_html(jobs: list[dict]) -> str:
 
 <script>
 function toggleRow(idx) {{
-  const btn = event.target;
+  const jobRow = document.getElementById(`job-${{idx}}`);
   const sampleRow = document.getElementById(`sample-${{idx}}`);
   if (!sampleRow) return;
 
   const isVisible = sampleRow.style.display !== 'none';
   sampleRow.style.display = isVisible ? 'none' : 'table-row';
-  btn.classList.toggle('open', !isVisible);
+  jobRow.classList.toggle('open', !isVisible);
 }}
 </script>
 
