@@ -81,20 +81,37 @@ def interpret_frequency(minute: str, hour: str, day: str, month: str, dow: str) 
         return "Custom"
 
 
+def load_samples() -> dict:
+    """Load sample output data if available."""
+    samples_file = Path(__file__).parent / "cron-samples.json"
+    if samples_file.exists():
+        try:
+            return json.loads(samples_file.read_text()).get("samples", {})
+        except (json.JSONDecodeError, OSError):
+            return {}
+    return {}
+
+
 def generate_html(jobs: list[dict]) -> str:
     """Generate HTML dashboard for cron jobs."""
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     import time
     tz = time.tzname[0] if time.localtime().tm_isdst == 0 else time.tzname[1]
 
+    samples = load_samples()
+
     job_rows = ""
 
     if not jobs:
-        job_rows = '<tr><td colspan="8" style="text-align:center;color:#888;">No cron jobs found</td></tr>'
+        job_rows = '<tr><td colspan="9" style="text-align:center;color:#888;">No cron jobs found</td></tr>'
     else:
-        for job in jobs:
+        for idx, job in enumerate(jobs):
             desc_cell = f'<td><span class="desc">{html_escape(job["description"])}</span></td>' if job["description"] else '<td style="color:#666;">—</td>'
-            job_rows += f'''    <tr>
+            sample_data = samples.get(job.get("description", ""))
+            expand_btn = f'<button class="expand-btn" onclick="toggleRow({idx})">▶</button>' if sample_data else '<span style="width:24px;"></span>'
+
+            job_rows += f'''    <tr class="job-row" id="job-{idx}">
+      {expand_btn}
       <td><code>{job['minute']}</code></td>
       <td><code>{job['hour']}</code></td>
       <td><code>{job['day_of_month']}</code></td>
@@ -103,6 +120,22 @@ def generate_html(jobs: list[dict]) -> str:
       <td><span class="freq-badge">{job['frequency']}</span></td>
       {desc_cell}
       <td><code class="cmd">{html_escape(job['command'])}</code></td>
+    </tr>\n'''
+
+            if sample_data:
+                sample_output = sample_data.get("sample", "")
+                if isinstance(sample_output, dict):
+                    sample_html = f"<pre>{html_escape(json.dumps(sample_output, indent=2))}</pre>"
+                else:
+                    sample_html = f"<pre>{html_escape(sample_output)}</pre>"
+
+                job_rows += f'''    <tr class="sample-row" id="sample-{idx}" style="display:none;">
+      <td colspan="9">
+        <div class="sample-container">
+          <div class="sample-label">Sample Output ({sample_data.get("output_type", "output")})</div>
+          {sample_html}
+        </div>
+      </td>
     </tr>\n'''
 
     return f"""<!DOCTYPE html>
@@ -130,6 +163,15 @@ def generate_html(jobs: list[dict]) -> str:
   .freq-badge {{ display: inline-block; font-size: 0.7rem; background: #1e40af; color: #93c5fd; border-radius: 4px; padding: 0.25rem 0.5rem; white-space: nowrap; }}
   .desc {{ color: #cbd5e1; font-size: 0.85rem; font-weight: 500; }}
 
+  .expand-btn {{ background: none; border: none; color: #64748b; cursor: pointer; font-size: 0.7rem; padding: 0; width: 24px; text-align: center; transition: transform 0.2s; }}
+  .expand-btn:hover {{ color: #93c5fd; }}
+  .expand-btn.open {{ transform: rotate(90deg); }}
+
+  .sample-row {{ background: #0f1117 !important; }}
+  .sample-container {{ padding: 1rem; background: #0a0e16; border: 1px solid #2d3348; border-radius: 8px; margin-top: 0.5rem; }}
+  .sample-label {{ font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; font-weight: 600; }}
+  .sample-row pre {{ background: #000; border: 1px solid #1a1f2e; border-radius: 4px; padding: 0.75rem; font-size: 0.7rem; color: #81c784; overflow-x: auto; margin: 0; }}
+
   .stats {{ display: flex; gap: 2rem; margin-bottom: 1.5rem; flex-wrap: wrap; }}
   .stat {{ display: flex; flex-direction: column; gap: 0.25rem; }}
   .stat-label {{ font-size: 0.7rem; color: #64748b; }}
@@ -156,6 +198,7 @@ def generate_html(jobs: list[dict]) -> str:
     <table>
       <thead>
         <tr>
+          <th style="width:24px;"></th>
           <th>Min</th>
           <th>Hour</th>
           <th>Day</th>
@@ -173,6 +216,18 @@ def generate_html(jobs: list[dict]) -> str:
 </div>
 
 <footer>Crontab: {len(jobs)} job{'s' if len(jobs) != 1 else ''} · Data: crontab -l</footer>
+
+<script>
+function toggleRow(idx) {{
+  const btn = event.target;
+  const sampleRow = document.getElementById(`sample-${{idx}}`);
+  if (!sampleRow) return;
+
+  const isVisible = sampleRow.style.display !== 'none';
+  sampleRow.style.display = isVisible ? 'none' : 'table-row';
+  btn.classList.toggle('open', !isVisible);
+}}
+</script>
 
 </body>
 </html>"""
