@@ -32,6 +32,12 @@ def parse_crontab() -> list[dict]:
 
         minute, hour, day, month, dow, command = parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]
 
+        # Extract description from trailing comment
+        description = ""
+        if " # " in command:
+            command, description = command.rsplit(" # ", 1)
+            description = description.strip()
+
         # Interpret frequency
         freq = interpret_frequency(minute, hour, day, month, dow)
 
@@ -42,6 +48,7 @@ def parse_crontab() -> list[dict]:
             "month": month,
             "day_of_week": dow,
             "command": command,
+            "description": description,
             "frequency": freq,
             "raw": line,
         })
@@ -56,9 +63,9 @@ def interpret_frequency(minute: str, hour: str, day: str, month: str, dow: str) 
     elif minute == "0" and hour == "*" and day == "*" and month == "*" and dow == "*":
         return "Hourly"
     elif minute == "0" and hour == "0" and day == "*" and month == "*" and dow == "*":
-        return "Daily"
+        return "Daily (midnight)"
     elif minute == "0" and hour == "0" and day == "1" and month == "*" and dow == "*":
-        return "Monthly"
+        return "Monthly (1st)"
     elif minute == "0" and hour == "0" and dow == "0":
         return "Weekly (Sunday)"
     elif minute == "0" and hour == "0" and dow == "1":
@@ -67,8 +74,9 @@ def interpret_frequency(minute: str, hour: str, day: str, month: str, dow: str) 
         return f"Weekly ({dow})"
     elif day != "*":
         return f"Day {day} of month"
-    elif hour != "*":
-        return f"At {hour}:00"
+    elif hour != "*" and day == "*" and month == "*" and dow == "*":
+        # Daily at specific time
+        return f"Daily at {hour}:{minute.zfill(2)}"
     else:
         return "Custom"
 
@@ -76,12 +84,16 @@ def interpret_frequency(minute: str, hour: str, day: str, month: str, dow: str) 
 def generate_html(jobs: list[dict]) -> str:
     """Generate HTML dashboard for cron jobs."""
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    import time
+    tz = time.tzname[0] if time.localtime().tm_isdst == 0 else time.tzname[1]
+
     job_rows = ""
 
     if not jobs:
-        job_rows = '<tr><td colspan="7" style="text-align:center;color:#888;">No cron jobs found</td></tr>'
+        job_rows = '<tr><td colspan="8" style="text-align:center;color:#888;">No cron jobs found</td></tr>'
     else:
         for job in jobs:
+            desc_cell = f'<td><span class="desc">{html_escape(job["description"])}</span></td>' if job["description"] else '<td style="color:#666;">—</td>'
             job_rows += f'''    <tr>
       <td><code>{job['minute']}</code></td>
       <td><code>{job['hour']}</code></td>
@@ -89,6 +101,7 @@ def generate_html(jobs: list[dict]) -> str:
       <td><code>{job['month']}</code></td>
       <td><code>{job['day_of_week']}</code></td>
       <td><span class="freq-badge">{job['frequency']}</span></td>
+      {desc_cell}
       <td><code class="cmd">{html_escape(job['command'])}</code></td>
     </tr>\n'''
 
@@ -115,6 +128,7 @@ def generate_html(jobs: list[dict]) -> str:
   code {{ background: #0a0e16; border: 1px solid #2d3348; border-radius: 4px; padding: 0.2rem 0.4rem; font-family: "Monaco", "Courier New", monospace; font-size: 0.8rem; color: #e2e8f0; }}
   .cmd {{ display: block; max-width: 400px; overflow: auto; word-break: break-all; }}
   .freq-badge {{ display: inline-block; font-size: 0.7rem; background: #1e40af; color: #93c5fd; border-radius: 4px; padding: 0.25rem 0.5rem; white-space: nowrap; }}
+  .desc {{ color: #cbd5e1; font-size: 0.85rem; font-weight: 500; }}
 
   .stats {{ display: flex; gap: 2rem; margin-bottom: 1.5rem; flex-wrap: wrap; }}
   .stat {{ display: flex; flex-direction: column; gap: 0.25rem; }}
@@ -127,7 +141,7 @@ def generate_html(jobs: list[dict]) -> str:
 <body>
 
 <h1>Crontab Viewer</h1>
-<p class="subtitle">Generated {now}</p>
+<p class="subtitle">Generated {now} · Timezone: {tz}</p>
 
 <div class="card">
   <div class="card-title">Cron Jobs Summary</div>
@@ -148,6 +162,7 @@ def generate_html(jobs: list[dict]) -> str:
           <th>Month</th>
           <th>DoW</th>
           <th>Frequency</th>
+          <th>Description</th>
           <th>Command</th>
         </tr>
       </thead>
