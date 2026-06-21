@@ -2,6 +2,5 @@
 crontab.json
 crontab.html
 
-# NOTE: cron-samples.json is checked in with ANONYMIZED sample data only.
-# Do NOT commit the real output of your cron jobs to this repo.
-# The skill regenerates crontab.json with real data locally for your use.
+# Sample output template (user-specific data, should not be committed)
+cron-samples.json
