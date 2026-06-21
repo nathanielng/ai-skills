@@ -110,8 +110,9 @@ def generate_html(jobs: list[dict]) -> str:
             sample_data = samples.get(job.get("description", ""))
             expand_indicator = '<span class="expand-indicator">▶</span>' if sample_data else ''
             clickable_class = 'clickable' if sample_data else ''
+            onclick_attr = f'onclick="toggleRow({idx})"' if sample_data else ''
 
-            job_rows += f'''    <tr class="job-row {clickable_class}" id="job-{idx}" onclick="toggleRow({idx})">
+            job_rows += f'''    <tr class="job-row {clickable_class}" id="job-{idx}" {onclick_attr}>
       <td>{expand_indicator}</td>
       <td><code>{job['minute']}</code></td>
       <td><code>{job['hour']}</code></td>
