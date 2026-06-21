@@ -1,2 +1,7 @@
+# Generated output files (contains real local data when script runs)
 crontab.json
 crontab.html
+
+# NOTE: cron-samples.json is checked in with ANONYMIZED sample data only.
+# Do NOT commit the real output of your cron jobs to this repo.
+# The skill regenerates crontab.json with real data locally for your use.
