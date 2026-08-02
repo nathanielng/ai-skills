@@ -67,6 +67,8 @@ include the summary even when an excerpt is also present.
 
 Excerpts are optional per section — use judgment. Prefer quality over quantity: a section with one strong excerpt is better than two weak ones. Skip excerpts if the content is tabular, a list of steps, or otherwise doesn't have quotable prose. The per-section summary is not optional.
 
+**Order is fixed and there is no other prose in a section**: heading → anchor comment → excerpt(s), if any → `**Summary:**` line. Never add a framing sentence before the excerpt/summary, and never put the excerpt after the summary — everything the section says must live inside the excerpt blockquote(s) and the one `**Summary:**` paragraph, nothing else.
+
 ### Anchors
 
 Every section must include an `<!-- anchor: "..." --> ` HTML comment directly under its heading: a short (5–12 word) snippet copied **verbatim, exact substring** from the source text, marking where that section begins. It's invisible when the outline is read as markdown/rendered — its only purpose is letting downstream tooling (e.g. `transcript-outline-html`) locate section boundaries in the original source. Pick a snippet unlikely to repeat elsewhere in the source (avoid generic phrases like "and so" or "thank you").
