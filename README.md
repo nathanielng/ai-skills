@@ -11,17 +11,29 @@ ai-skills/
 │   ├── bedrock-troubleshoot/  # Diagnose AWS Bedrock issues
 │   ├── commit-check/     # Scan staged changes for secrets, PII, hardcoded paths
 │   ├── create-guide/     # Generate structured guides from conversation context
+│   ├── crontab-viewer/   # Parse crontab into an interactive HTML dashboard
 │   ├── discussion-to-plan/   # Convert discussion threads into structured plans
+│   ├── html-guide-style/ # Reusable dark-themed single-page HTML guide/cheat-sheet template
+│   ├── outline/          # Structured outline with per-section summaries, excerpts, and key takeaways
 │   ├── pageindex/        # Query Obsidian vault via PageIndex (vectorless RAG)
 │   ├── save-learnings/   # Save learnings from conversations to Obsidian vault
-│   └── upload-lambda-layer/  # Publish zip files as AWS Lambda layers
+│   ├── sermon-outline/   # In-depth outline of just the sermon portion of a church service transcript
+│   ├── sermon-outline-html/  # Merge a transcript + sermon-outline into an HTML page with per-point toggles
+│   ├── transcript-outline-html/  # Merge a transcript + outline into an HTML page with per-section toggles
+│   ├── upload-lambda-layer/  # Publish zip files as AWS Lambda layers
+│   └── youtube-transcriber/  # Extract transcripts from YouTube videos as Markdown
 │
 ├── kiro-skills/          # Kiro skills (Kiro SKILL.md format with YAML frontmatter)
 │   ├── audio-transcribe/ # On-device speech-to-text via Apple Silicon Metal
 │   ├── bedrock-troubleshoot/  # Diagnose AWS Bedrock issues
+│   ├── html-guide-style/ # Reusable dark-themed single-page HTML guide/cheat-sheet template
+│   ├── outline/          # Structured outline with per-section summaries, excerpts, and key takeaways
 │   ├── pageindex/        # Query Obsidian vault via PageIndex
 │   ├── pdf-to-markdown/  # Convert PDFs to Markdown via OpenDataLoader
 │   ├── save-learnings/   # Save learnings to Obsidian vault
+│   ├── sermon-outline/   # In-depth outline of just the sermon portion of a church service transcript
+│   ├── sermon-outline-html/  # Merge a transcript + sermon-outline into an HTML page with per-point toggles
+│   ├── transcript-outline-html/  # Merge a transcript + outline into an HTML page with per-section toggles
 │   ├── web-to-markdown/  # Fetch web pages and convert to Markdown
 │   └── youtube-transcriber/  # Extract transcripts from YouTube videos
 │
