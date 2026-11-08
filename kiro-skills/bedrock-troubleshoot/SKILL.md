@@ -54,6 +54,26 @@ python3 ~/code/ai-skills/claude-skills/bedrock-troubleshoot/diagnose.py --mantle
 | `Unknown service: bedrock-runtime` | Use API version `bedrock-2023-05-31` |
 | `401 Unauthorized` (Mantle) | Regenerate bearer token |
 | `Region not supported` (Mantle) | Use `us-west-2` |
+| `ValueError: Cannot specify both api_key and AWS credentials` | `AWS_BEARER_TOKEN_BEDROCK` is set — see below |
+| `403 "Authentication failed: Please make sure your API Key is valid"` despite working `aws sts get-caller-identity` | Same cause — see below |
+
+## AWS_BEARER_TOKEN_BEDROCK vs. SigV4
+
+If `AWS_BEARER_TOKEN_BEDROCK` is set in the shell, it does **not** gracefully
+fall back to IAM/SigV4 when both are present. The `anthropic` SDK's
+`AnthropicBedrock` client reads that env var as its default `api_key`
+unconditionally, before any `aws_profile`/`aws_access_key` you pass — if both
+are present it raises `ValueError` instead of picking one; if the token alone
+is stale, you get a `403` that reads like an IAM error but isn't (`aws sts
+get-caller-identity` will still succeed, since that's a different credential
+path entirely).
+
+Diagnose: `echo "${AWS_BEARER_TOKEN_BEDROCK:+set}"`.
+
+Fix: `unset AWS_BEARER_TOKEN_BEDROCK` for the session (or remove it from
+`~/.zshrc`), or — in code that should always use SigV4 —
+`os.environ.pop("AWS_BEARER_TOKEN_BEDROCK", None)` before constructing the
+client. Passing `aws_profile` alone is not enough to override it.
 
 ## Reference Docs
 
